@@ -10,7 +10,7 @@ interface Photo {
   imageUrl: string
   category: string
   isFeatured: boolean
-  album?: { title: string } | null
+  album?: { id: string; title: string } | null
   createdAt: string
 }
 
