@@ -131,3 +131,4 @@ MIT
 ---
 
 Made with ❤️ by Xclaw 🦉
+# Build fix for Prisma 7
