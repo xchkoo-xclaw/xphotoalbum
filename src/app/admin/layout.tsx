@@ -17,8 +17,19 @@ export default async function AdminLayout({
 }) {
   const session = await auth()
   
-  if (!session) {
+  // If not logged in and not on login page, redirect to login
+  if (!session && !children?.toString().includes("AdminLogin")) {
     redirect("/admin/login")
+  }
+
+  // If logged in and on login page, redirect to dashboard
+  if (session && children?.toString().includes("AdminLogin")) {
+    redirect("/admin")
+  }
+
+  // If not logged in and on login page, show login page without sidebar
+  if (!session) {
+    return <>{children}</>
   }
 
   return (
