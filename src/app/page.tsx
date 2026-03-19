@@ -1,24 +1,66 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { motion } from "framer-motion"
 
-interface Photo {
-  id: string
-  title: string | null
-  imageUrl: string
-  thumbnailUrl: string | null
-  category: string
-}
-
-interface SiteSettings {
-  siteTitle: string
-  siteDescription: string | null
-  heroImage: string | null
-  featuredCount: number
-}
+// 静态照片数据
+const PHOTOS = [
+  {
+    id: "1",
+    title: "东京夜景",
+    imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&auto=format&fit=crop",
+    category: "night",
+  },
+  {
+    id: "2",
+    title: "人像摄影",
+    imageUrl: "https://images.unsplash.com/photo-1494790108755-2616b786d4d9?w-800&auto=format&fit=crop",
+    category: "portrait",
+  },
+  {
+    id: "3",
+    title: "富士山",
+    imageUrl: "https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&auto=format&fit=crop",
+    category: "landscape",
+  },
+  {
+    id: "4",
+    title: "日本料理",
+    imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop",
+    category: "food",
+  },
+  {
+    id: "5",
+    title: "街头生活",
+    imageUrl: "https://images.unsplash.com/photo-1511735111819-9a3f7709049c?w=800&auto=format&fit=crop",
+    category: "street",
+  },
+  {
+    id: "6",
+    title: "现代建筑",
+    imageUrl: "https://images.unsplash.com/photo-1487956382158-bb926046304a?w=800&auto=format&fit=crop",
+    category: "architecture",
+  },
+  {
+    id: "7",
+    title: "旅行记忆",
+    imageUrl: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&auto=format&fit=crop",
+    category: "travel",
+  },
+  {
+    id: "8",
+    title: "森林狐狸",
+    imageUrl: "https://images.unsplash.com/photo-1550358864-518f202c02ba?w=800&auto=format&fit=crop",
+    category: "animal",
+  },
+  {
+    id: "9",
+    title: "微距花朵",
+    imageUrl: "https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?w=800&auto=format&fit=crop",
+    category: "macro",
+  },
+]
 
 const CATEGORIES = [
   { id: "all", name: "全部", icon: "📸" },
@@ -37,104 +79,60 @@ const CATEGORIES = [
 ]
 
 export default function HomePage() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null)
-  const [photos, setPhotos] = useState<Photo[]>([])
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [loading, setLoading] = useState(true)
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [settingsRes, photosRes] = await Promise.all([
-          fetch("/api/settings"),
-          fetch("/api/photos?featured=true"),
-        ])
-        
-        if (!settingsRes.ok) {
-          throw new Error(`Settings API error: ${settingsRes.status}`)
-        }
-        
-        if (!photosRes.ok) {
-          throw new Error(`Photos API error: ${photosRes.status}`)
-        }
-        
-        const settingsData = await settingsRes.json()
-        const photosData = await photosRes.json()
-        
-        setSettings(settingsData)
-        setPhotos(Array.isArray(photosData) ? photosData : [])
-      } catch (error) {
-        console.error("Error fetching data:", error)
-        setPhotos([]) // Ensure photos is always an array
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
+  const [selectedPhoto, setSelectedPhoto] = useState<typeof PHOTOS[0] | null>(null)
 
   const filteredPhotos = selectedCategory === "all"
-    ? photos
-    : photos.filter(p => p.category === selectedCategory)
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="animate-pulse text-white text-xl">Loading...</div>
-      </div>
-    )
-  }
+    ? PHOTOS
+    : PHOTOS.filter(p => p.category === selectedCategory)
 
   return (
     <main className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      {settings?.heroImage && (
-        <section className="relative h-screen w-full">
-          <Image
-            src={settings.heroImage}
-            alt="Hero"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-5xl md:text-7xl font-bold mb-4"
-            >
-              {settings.siteTitle}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-xl md:text-2xl text-gray-300 max-w-2xl"
-            >
-              {settings.siteDescription}
-            </motion.p>
-          </div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.8 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2"
+      <section className="relative h-screen w-full">
+        <Image
+          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&auto=format&fit=crop"
+          alt="Hero"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-5xl md:text-7xl font-bold mb-4"
           >
-            <Link
-              href="#gallery"
-              className="flex flex-col items-center text-gray-400 hover:text-white transition-colors"
-            >
-              <span className="text-sm mb-2">Scroll to explore</span>
-              <svg className="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </Link>
-          </motion.div>
-        </section>
-      )}
+            xPhotoAlbum
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl md:text-2xl text-gray-300 max-w-2xl"
+          >
+            专业摄影作品展示
+          </motion.p>
+        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <a
+            href="#gallery"
+            className="flex flex-col items-center text-gray-400 hover:text-white transition-colors"
+          >
+            <span className="text-sm mb-2">Scroll to explore</span>
+            <svg className="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </a>
+        </motion.div>
+      </section>
 
       {/* Category Filter */}
       <section id="gallery" className="sticky top-0 z-40 bg-black/80 backdrop-blur-lg border-b border-white/10">
@@ -172,7 +170,7 @@ export default function HomePage() {
             >
               <Image
                 src={photo.imageUrl}
-                alt={photo.title || "Photo"}
+                alt={photo.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -180,7 +178,7 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <p className="text-white font-medium truncate">
-                    {photo.title || "Untitled"}
+                    {photo.title}
                   </p>
                   <p className="text-gray-400 text-sm">
                     {CATEGORIES.find(c => c.id === photo.category)?.name || photo.category}
@@ -215,7 +213,7 @@ export default function HomePage() {
           <div className="relative max-w-5xl max-h-[90vh] w-full" onClick={e => e.stopPropagation()}>
             <Image
               src={selectedPhoto.imageUrl}
-              alt={selectedPhoto.title || "Photo"}
+              alt={selectedPhoto.title}
               width={1920}
               height={1080}
               className="w-full h-auto max-h-[85vh] object-contain"
@@ -235,7 +233,8 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-white/10 py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-500">
-          <p>© 2026 {settings?.siteTitle || "xPhotoAlbum"}. All rights reserved.</p>
+          <p>© 2026 xPhotoAlbum. All rights reserved.</p>
+          <p className="text-sm mt-2">摄影作品展示网站</p>
         </div>
       </footer>
     </main>
